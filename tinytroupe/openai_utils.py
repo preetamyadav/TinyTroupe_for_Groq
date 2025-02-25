@@ -564,6 +564,7 @@ class OpenAIClient:
                 "gpt-4-0613",
                 "gpt-4-32k-0613",
                 "llama3-8b-8192",
+                "gemma2-9b-it"
                 }:
                 tokens_per_message = 3
                 tokens_per_name = 1
