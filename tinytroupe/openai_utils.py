@@ -25,7 +25,7 @@ config = utils.read_config_file()
 # Default parameter values
 ###########################################################################
 default = {}
-default["groq_model"] = "llama3-8b-8192"
+default["groq_model"] = "gemma2-9b-it"
 default["model"] = config["OpenAI"].get("MODEL", "gpt-4o")
 default["max_tokens"] = int(config["OpenAI"].get("MAX_TOKENS", "1024"))
 default["temperature"] = float(config["OpenAI"].get("TEMPERATURE", "1.0"))
