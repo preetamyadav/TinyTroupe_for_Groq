@@ -488,26 +488,39 @@ class OpenAIClient:
 
         logger.error(f"Failed to get response after {max_attempts} attempts.")
         return None
-    
+
     def _raw_model_call(self, model, chat_api_params):
         """
-        Calls the OpenAI API with the given parameters. Subclasses should
-        override this method to implement their own API calls.
-        """   
+        Calls the Groq API with the given parameters. Adjusted to remove
+        unsupported OpenAI-specific methods.
+        """
 
         if "response_format" in chat_api_params:
-            # to enforce the response format via pydantic, we need to use a different method
-
+            # Groq does not support OpenAI's "parse" method, so we just call create
             del chat_api_params["stream"]
 
-            return self.client.beta.chat.completions.parse(
-                    **chat_api_params
-                )
-        
-        else:
-            return self.client.chat.completions.create(
-                        **chat_api_params
-                    )
+        return self.client.chat.completions.create(**chat_api_params)
+
+
+    # def _raw_model_call(self, model, chat_api_params):
+    #     """
+    #     Calls the OpenAI API with the given parameters. Subclasses should
+    #     override this method to implement their own API calls.
+    #     """
+    #
+    #     if "response_format" in chat_api_params:
+    #         # to enforce the response format via pydantic, we need to use a different method
+    #
+    #         del chat_api_params["stream"]
+    #
+    #         return self.client.beta.chat.completions.parse(
+    #                 **chat_api_params
+    #             )
+    #
+    #     else:
+    #         return self.client.chat.completions.create(
+    #                     **chat_api_params
+    #                 )
 
     def _raw_model_response_extractor(self, response):
         """
