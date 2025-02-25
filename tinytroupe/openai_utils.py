@@ -1,5 +1,6 @@
 import os
 import openai
+from groq import Groq
 from openai import OpenAI, AzureOpenAI
 import time
 import json
@@ -23,6 +24,7 @@ config = utils.read_config_file()
 # Default parameter values
 ###########################################################################
 default = {}
+default["groq_model"] = "llama3-8b-8192"
 default["model"] = config["OpenAI"].get("MODEL", "gpt-4o")
 default["max_tokens"] = int(config["OpenAI"].get("MAX_TOKENS", "1024"))
 default["temperature"] = float(config["OpenAI"].get("TEMPERATURE", "1.0"))
@@ -345,11 +347,12 @@ class OpenAIClient:
         """
         Sets up the OpenAI API configurations for this client.
         """
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        self.client =  Groq (api_key=os.environ.get("GROQ_API_KEY")) #OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     def send_message(self,
                     current_messages,
-                     model=default["model"],
+                     model=default["groq_model"],
                      temperature=default["temperature"],
                      max_tokens=default["max_tokens"],
                      top_p=default["top_p"],
