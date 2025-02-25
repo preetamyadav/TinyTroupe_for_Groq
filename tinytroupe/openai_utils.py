@@ -13,6 +13,7 @@ import textwrap  # to dedent strings
 
 import tiktoken
 from tinytroupe import utils
+import json
 from tinytroupe.control import transactional
 
 logger = logging.getLogger("tinytroupe")
@@ -489,18 +490,24 @@ class OpenAIClient:
         logger.error(f"Failed to get response after {max_attempts} attempts.")
         return None
 
+
+
     def _raw_model_call(self, model, chat_api_params):
         """
-        Calls the Groq API with the given parameters. Adjusted to remove
-        unsupported OpenAI-specific methods.
+        Calls the Groq API with the given parameters. Ensures that
+        all parameters are JSON serializable.
         """
 
         if "response_format" in chat_api_params:
-            # Groq does not support OpenAI's "parse" method, so we just call create
-            del chat_api_params["stream"]
+            del chat_api_params["stream"]  # Remove stream parameter if needed
+
+        # ✅ Convert Pydantic models or objects to dictionaries
+        try:
+            chat_api_params = json.loads(json.dumps(chat_api_params, default=str))
+        except Exception as e:
+            raise ValueError(f"Failed to serialize chat_api_params: {e}")
 
         return self.client.chat.completions.create(**chat_api_params)
-
 
     # def _raw_model_call(self, model, chat_api_params):
     #     """
