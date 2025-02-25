@@ -349,7 +349,7 @@ class OpenAIClient:
         Sets up the OpenAI API configurations for this client.
         """
 
-        self.client =  Groq (api_key=os.environ.get("GROQ_API_KEY")) #OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client =  OpenAI(base_url="https://api.groq.com/openai/v1",api_key=os.environ.get("GROQ_API_KEY")) # Groq (api_key=os.environ.get("GROQ_API_KEY")) #
 
     def send_message(self,
                     current_messages,
@@ -492,46 +492,46 @@ class OpenAIClient:
 
 
 
-    def _raw_model_call(self, model, chat_api_params):
-        """
-        Calls the Groq API with the given parameters. Ensures that
-        all parameters are JSON serializable.
-        """
-
-        if "response_format" in chat_api_params:
-            del chat_api_params["stream"]  # Remove stream parameter if needed
-
-
-        if not isinstance(chat_api_params["response_format"], dict):
-            chat_api_params["response_format"] = {}
-
-        # ✅ Convert Pydantic models or objects to dictionaries
-        try:
-            chat_api_params = json.loads(json.dumps(chat_api_params, default=str))
-        except Exception as e:
-            raise ValueError(f"Failed to serialize chat_api_params: {e}")
-
-        return self.client.chat.completions.create(**chat_api_params)
-
     # def _raw_model_call(self, model, chat_api_params):
     #     """
-    #     Calls the OpenAI API with the given parameters. Subclasses should
-    #     override this method to implement their own API calls.
+    #     Calls the Groq API with the given parameters. Ensures that
+    #     all parameters are JSON serializable.
     #     """
     #
     #     if "response_format" in chat_api_params:
-    #         # to enforce the response format via pydantic, we need to use a different method
+    #         del chat_api_params["stream"]  # Remove stream parameter if needed
     #
-    #         del chat_api_params["stream"]
     #
-    #         return self.client.beta.chat.completions.parse(
-    #                 **chat_api_params
-    #             )
+    #     if not isinstance(chat_api_params["response_format"], dict):
+    #         chat_api_params["response_format"] = {}
     #
-    #     else:
-    #         return self.client.chat.completions.create(
-    #                     **chat_api_params
-    #                 )
+    #     # ✅ Convert Pydantic models or objects to dictionaries
+    #     try:
+    #         chat_api_params = json.loads(json.dumps(chat_api_params, default=str))
+    #     except Exception as e:
+    #         raise ValueError(f"Failed to serialize chat_api_params: {e}")
+
+        # return self.client.chat.completions.create(**chat_api_params)
+
+    def _raw_model_call(self, model, chat_api_params):
+        """
+        Calls the OpenAI API with the given parameters. Subclasses should
+        override this method to implement their own API calls.
+        """
+
+        if "response_format" in chat_api_params:
+            # to enforce the response format via pydantic, we need to use a different method
+
+            del chat_api_params["stream"]
+
+            return self.client.beta.chat.completions.parse(
+                    **chat_api_params
+                )
+
+        else:
+            return self.client.chat.completions.create(
+                        **chat_api_params
+                    )
 
     def _raw_model_response_extractor(self, response):
         """
