@@ -365,7 +365,7 @@ class OpenAIClient:
                      waiting_time=default["waiting_time"],
                      exponential_backoff_factor=default["exponential_backoff_factor"],
                      n = 1,
-                     response_format=None,
+                     response_format={},
                      echo=False):
         """
         Sends a message to the OpenAI API and returns the response.
@@ -500,6 +500,10 @@ class OpenAIClient:
 
         if "response_format" in chat_api_params:
             del chat_api_params["stream"]  # Remove stream parameter if needed
+
+
+        if not isinstance(chat_api_params["response_format"], dict):
+            chat_api_params["response_format"] = {}
 
         # ✅ Convert Pydantic models or objects to dictionaries
         try:
